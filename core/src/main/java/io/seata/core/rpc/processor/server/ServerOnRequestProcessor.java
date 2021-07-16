@@ -117,7 +117,7 @@ public class ServerOnRequestProcessor implements RemotingProcessor {
             }
             MergeResultMessage resultMessage = new MergeResultMessage();
             resultMessage.setMsgs(results);
-            remotingServer.sendAsyncResponse(rpcMessage, ctx.channel(), resultMessage);
+            remotingServer.sendAsyncResponse(rpcMessage, ctx.channel(), resultMessage); // TODO 这里响应
         } else {
             // the single send request message
             final AbstractMessage msg = (AbstractMessage) message;

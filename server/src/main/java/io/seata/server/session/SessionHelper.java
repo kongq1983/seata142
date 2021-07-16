@@ -40,7 +40,7 @@ public class SessionHelper {
         return newBranchByGlobal(globalSession, branchType, resourceId, null, lockKeys, clientId);
     }
 
-    /**
+    /** TODO 分支事务创建
      * New branch by global branch session.
      *
      * @param globalSession the global session
@@ -56,7 +56,7 @@ public class SessionHelper {
 
         branchSession.setXid(globalSession.getXid());
         branchSession.setTransactionId(globalSession.getTransactionId());
-        branchSession.setBranchId(UUIDGenerator.generateUUID());
+        branchSession.setBranchId(UUIDGenerator.generateUUID()); // todo 生成分支事务id
         branchSession.setBranchType(branchType);
         branchSession.setResourceId(resourceId);
         branchSession.setLockKey(lockKeys);

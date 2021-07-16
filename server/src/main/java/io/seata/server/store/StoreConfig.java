@@ -48,7 +48,7 @@ public class StoreConfig {
     public static int getMaxBranchSessionSize() {
         return CONFIGURATION.getInt(STORE_FILE_PREFIX + "maxBranchSessionSize", DEFAULT_MAX_BRANCH_SESSION_SIZE);
     }
-
+    /** DEFAULT_MAX_GLOBAL_SESSION_SIZE 512 */
     public static int getMaxGlobalSessionSize() {
         return CONFIGURATION.getInt(STORE_FILE_PREFIX + "maxGlobalSessionSize", DEFAULT_MAX_GLOBAL_SESSION_SIZE);
     }

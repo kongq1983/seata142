@@ -110,7 +110,7 @@ public class TransactionalTemplate {
 
             // 1.3 If null, create new transaction with role 'GlobalTransactionRole.Launcher'.
             if (tx == null) {
-                tx = GlobalTransactionContext.createNew();
+                tx = GlobalTransactionContext.createNew();  // TODO 开启新事物
             }
 
             // set current tx config to holder
@@ -119,7 +119,7 @@ public class TransactionalTemplate {
             try {
                 // 2. If the tx role is 'GlobalTransactionRole.Launcher', send the request of beginTransaction to TC,
                 //    else do nothing. Of course, the hooks will still be triggered.
-                beginTransaction(txInfo, tx);
+                beginTransaction(txInfo, tx); // 调用begin 会获取xid
 
                 Object rs;
                 try {
@@ -201,9 +201,9 @@ public class TransactionalTemplate {
     }
 
     private void rollbackTransaction(GlobalTransaction tx, Throwable originalException) throws TransactionException, TransactionalExecutor.ExecutionException {
-        triggerBeforeRollback();
+        triggerBeforeRollback(); // 默认不会执行
         tx.rollback();
-        triggerAfterRollback();
+        triggerAfterRollback();  // 默认不会执行
         // 3.1 Successfully rolled back
         throw new TransactionalExecutor.ExecutionException(tx, GlobalStatus.RollbackRetrying.equals(tx.getLocalStatus())
             ? TransactionalExecutor.Code.RollbackRetrying : TransactionalExecutor.Code.RollbackDone, originalException);
@@ -211,9 +211,9 @@ public class TransactionalTemplate {
 
     private void beginTransaction(TransactionInfo txInfo, GlobalTransaction tx) throws TransactionalExecutor.ExecutionException {
         try {
-            triggerBeforeBegin();
+            triggerBeforeBegin(); // 默认getCurrentHooks是空
             tx.begin(txInfo.getTimeOut(), txInfo.getName());
-            triggerAfterBegin();
+            triggerAfterBegin(); // 默认getCurrentHooks是空
         } catch (TransactionException txe) {
             throw new TransactionalExecutor.ExecutionException(tx, txe,
                 TransactionalExecutor.Code.BeginFailure);

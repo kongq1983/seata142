@@ -137,7 +137,7 @@ public class DbAndReportTcStateLogStore extends AbstractStore implements StateLo
             transactionInfo.setTimeOut(stateMachineConfig.getTransOperationTimeout());
             transactionInfo.setName(Constants.SAGA_TRANS_NAME_PREFIX + machineInstance.getStateMachine().getName());
             try {
-                GlobalTransaction globalTransaction = sagaTransactionalTemplate.beginTransaction(transactionInfo);
+                GlobalTransaction globalTransaction = sagaTransactionalTemplate.beginTransaction(transactionInfo); // todo xid  beginTransaction
                 machineInstance.setId(globalTransaction.getXid());
 
                 context.setVariable(DomainConstants.VAR_NAME_GLOBAL_TX, globalTransaction);

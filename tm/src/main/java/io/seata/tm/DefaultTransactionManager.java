@@ -44,17 +44,17 @@ import java.util.concurrent.TimeoutException;
  */
 public class DefaultTransactionManager implements TransactionManager {
 
-    @Override
+    @Override // TODO 获取xid
     public String begin(String applicationId, String transactionServiceGroup, String name, int timeout)
         throws TransactionException {
         GlobalBeginRequest request = new GlobalBeginRequest();
         request.setTransactionName(name);
         request.setTimeout(timeout);
-        GlobalBeginResponse response = (GlobalBeginResponse) syncCall(request);
+        GlobalBeginResponse response = (GlobalBeginResponse) syncCall(request); // TODO XID 调用tc
         if (response.getResultCode() == ResultCode.Failed) {
             throw new TmTransactionException(TransactionExceptionCode.BeginFailed, response.getMsg());
         }
-        return response.getXid();
+        return response.getXid(); // TODO 获取xid
     }
 
     @Override

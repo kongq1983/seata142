@@ -57,11 +57,11 @@ public abstract class AbstractTCInboundHandler extends AbstractExceptionHandler 
     @Override
     public GlobalBeginResponse handle(GlobalBeginRequest request, final RpcContext rpcContext) {
         GlobalBeginResponse response = new GlobalBeginResponse();
-        exceptionHandleTemplate(new AbstractCallback<GlobalBeginRequest, GlobalBeginResponse>() {
+        exceptionHandleTemplate(new AbstractCallback<GlobalBeginRequest, GlobalBeginResponse>() { // TODO XID
             @Override
             public void execute(GlobalBeginRequest request, GlobalBeginResponse response) throws TransactionException {
                 try {
-                    doGlobalBegin(request, response, rpcContext);
+                    doGlobalBegin(request, response, rpcContext); // TODO XID  回调调用这里  从这里开始-------------
                 } catch (StoreException e) {
                     throw new TransactionException(TransactionExceptionCode.FailedStore,
                         String.format("begin global request failed. xid=%s, msg=%s", response.getXid(), e.getMessage()),

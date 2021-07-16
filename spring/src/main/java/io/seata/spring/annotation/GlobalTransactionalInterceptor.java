@@ -119,13 +119,13 @@ public class GlobalTransactionalInterceptor implements ConfigurationChangeListen
         this.disable = ConfigurationFactory.getInstance().getBoolean(ConfigurationKeys.DISABLE_GLOBAL_TRANSACTION,
             DEFAULT_DISABLE_GLOBAL_TRANSACTION);
         degradeCheck = ConfigurationFactory.getInstance().getBoolean(ConfigurationKeys.CLIENT_DEGRADE_CHECK,
-            DEFAULT_TM_DEGRADE_CHECK);
-        if (degradeCheck) {
+            DEFAULT_TM_DEGRADE_CHECK); // DEFAULT_TM_DEGRADE_CHECK 默认false
+        if (degradeCheck) { // 默认false
             ConfigurationCache.addConfigListener(ConfigurationKeys.CLIENT_DEGRADE_CHECK, this);
             degradeCheckPeriod = ConfigurationFactory.getInstance().getInt(
-                ConfigurationKeys.CLIENT_DEGRADE_CHECK_PERIOD, DEFAULT_TM_DEGRADE_CHECK_PERIOD);
+                ConfigurationKeys.CLIENT_DEGRADE_CHECK_PERIOD, DEFAULT_TM_DEGRADE_CHECK_PERIOD); // DEFAULT_TM_DEGRADE_CHECK_PERIOD默认2000
             degradeCheckAllowTimes = ConfigurationFactory.getInstance().getInt(
-                ConfigurationKeys.CLIENT_DEGRADE_CHECK_ALLOW_TIMES, DEFAULT_TM_DEGRADE_CHECK_ALLOW_TIMES);
+                ConfigurationKeys.CLIENT_DEGRADE_CHECK_ALLOW_TIMES, DEFAULT_TM_DEGRADE_CHECK_ALLOW_TIMES); // DEFAULT_TM_DEGRADE_CHECK_ALLOW_TIMES 默认10
             EVENT_BUS.register(this);
             if (degradeCheckPeriod > 0 && degradeCheckAllowTimes > 0) {
                 startDegradeCheck();
@@ -133,16 +133,16 @@ public class GlobalTransactionalInterceptor implements ConfigurationChangeListen
         }
         this.initDefaultGlobalTransactionTimeout();
     }
-
+    /** @GlobalTransactional */
     @Override
     public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
         Class<?> targetClass =
-            methodInvocation.getThis() != null ? AopUtils.getTargetClass(methodInvocation.getThis()) : null;
-        Method specificMethod = ClassUtils.getMostSpecificMethod(methodInvocation.getMethod(), targetClass);
+            methodInvocation.getThis() != null ? AopUtils.getTargetClass(methodInvocation.getThis()) : null;  // 得到原始对象 比如io.seata.samples.business.service.BusinessService
+        Method specificMethod = ClassUtils.getMostSpecificMethod(methodInvocation.getMethod(), targetClass); // 原始方法
         if (specificMethod != null && !specificMethod.getDeclaringClass().equals(Object.class)) {
             final Method method = BridgeMethodResolver.findBridgedMethod(specificMethod);
             final GlobalTransactional globalTransactionalAnnotation =
-                getAnnotation(method, targetClass, GlobalTransactional.class);
+                getAnnotation(method, targetClass, GlobalTransactional.class); // 得到GlobalTransactional注解对象
             final GlobalLock globalLockAnnotation = getAnnotation(method, targetClass, GlobalLock.class);
             boolean localDisable = disable || (degradeCheck && degradeNum >= degradeCheckAllowTimes);
             if (!localDisable) {

@@ -39,7 +39,7 @@ public class NettyServerConfig extends NettyBaseConfig {
             ConfigurationKeys.TRANSPORT_PREFIX + "serverSocketSendBufSize", String.valueOf(153600)));
     private int serverSocketResvBufSize = Integer.parseInt(System.getProperty(
             ConfigurationKeys.TRANSPORT_PREFIX + "serverSocketResvBufSize", String.valueOf(153600)));
-    private int serverWorkerThreads = Integer.parseInt(System.getProperty(
+    private int serverWorkerThreads = Integer.parseInt(System.getProperty( // netty 工作现场大小
             ConfigurationKeys.TRANSPORT_PREFIX + "serverWorkerThreads", String.valueOf(WORKER_THREAD_SIZE)));
     private int soBackLogSize = Integer.parseInt(System.getProperty(
             ConfigurationKeys.TRANSPORT_PREFIX + "soBackLogSize", String.valueOf(1024)));

@@ -123,12 +123,12 @@ public class DefaultCore implements Core {
         return getCore(branchSession.getBranchType()).branchRollback(globalSession, branchSession);
     }
 
-    @Override
+    @Override // TODO xid  seata-server
     public String begin(String applicationId, String transactionServiceGroup, String name, int timeout)
         throws TransactionException {
         GlobalSession session = GlobalSession.createGlobalSession(applicationId, transactionServiceGroup, name,
-            timeout);
-        MDC.put(RootContext.MDC_KEY_XID, session.getXid());
+            timeout); // TODO 生成XID
+        MDC.put(RootContext.MDC_KEY_XID, session.getXid()); // 日志
         session.addSessionLifecycleListener(SessionHolder.getRootSessionManager());
 
         session.begin();

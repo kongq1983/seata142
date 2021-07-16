@@ -55,7 +55,7 @@ public abstract class AbstractResultMessage extends AbstractMessage  {
 
     /**
      * Sets msg.
-     *
+     *T
      * @param msg the msg
      */
     public void setMsg(String msg) {

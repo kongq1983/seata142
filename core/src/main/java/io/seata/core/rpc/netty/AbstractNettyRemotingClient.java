@@ -138,7 +138,7 @@ public abstract class AbstractNettyRemotingClient extends AbstractNettyRemoting 
 
     @Override
     public Object sendSyncRequest(Object msg) throws TimeoutException {
-        String serverAddress = loadBalance(getTransactionServiceGroup(), msg);
+        String serverAddress = loadBalance(getTransactionServiceGroup(), msg); // 负载均衡 seata-server
         int timeoutMillis = NettyClientConfig.getRpcRequestTimeout();
         RpcMessage rpcMessage = buildRequestMessage(msg, ProtocolConstants.MSGTYPE_RESQUEST_SYNC);
 

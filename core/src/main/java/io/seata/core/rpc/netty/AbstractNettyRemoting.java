@@ -233,7 +233,7 @@ public abstract class AbstractNettyRemoting implements Disposable {
     protected RpcMessage buildRequestMessage(Object msg, byte messageType) {
         RpcMessage rpcMessage = new RpcMessage();
         rpcMessage.setId(getNextMessageId());
-        rpcMessage.setMessageType(messageType);
+        rpcMessage.setMessageType(messageType); // 0: MSGTYPE_RESQUEST_SYNC
         rpcMessage.setCodec(ProtocolConstants.CONFIGURED_CODEC);
         rpcMessage.setCompressor(ProtocolConstants.CONFIGURED_COMPRESSOR);
         rpcMessage.setBody(msg);
@@ -270,7 +270,7 @@ public abstract class AbstractNettyRemoting implements Disposable {
         Object body = rpcMessage.getBody();
         if (body instanceof MessageTypeAware) {
             MessageTypeAware messageTypeAware = (MessageTypeAware) body;
-            final Pair<RemotingProcessor, ExecutorService> pair = this.processorTable.get((int) messageTypeAware.getTypeCode());
+            final Pair<RemotingProcessor, ExecutorService> pair = this.processorTable.get((int) messageTypeAware.getTypeCode()); // todo processor get
             if (pair != null) {
                 if (pair.getSecond() != null) {
                     try {

@@ -55,13 +55,13 @@ import static io.seata.core.model.GlobalStatus.Committing;
 public class GlobalSession implements SessionLifecycle, SessionStorable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSession.class);
-
+    /** default : 512 */
     private static final int MAX_GLOBAL_SESSION_SIZE = StoreConfig.getMaxGlobalSessionSize();
 
     private static ThreadLocal<ByteBuffer> byteBufferThreadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(
         MAX_GLOBAL_SESSION_SIZE));
 
-    /**
+    /** DEFAULT_RETRY_DEAD_THRESHOLD默认: 130000
      * If the global session's status is (Rollbacking or Committing) and currentTime - createTime >= RETRY_DEAD_THRESHOLD
      *  then the tx will be remand as need to retry rollback
      */
@@ -340,11 +340,11 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
         this.transactionId = UUIDGenerator.generateUUID();
         this.status = GlobalStatus.Begin;
 
-        this.applicationId = applicationId;
+        this.applicationId = applicationId; // TODO  XID 调试入口
         this.transactionServiceGroup = transactionServiceGroup;
         this.transactionName = transactionName;
         this.timeout = timeout;
-        this.xid = XID.generateXID(transactionId);
+        this.xid = XID.generateXID(transactionId); // TODO xid 生成xid
     }
 
     /**

@@ -172,7 +172,7 @@ public abstract class AbstractNettyRemotingServer extends AbstractNettyRemoting 
             if (!(msg instanceof RpcMessage)) {
                 return;
             }
-            processMessage(ctx, (RpcMessage) msg);
+            processMessage(ctx, (RpcMessage) msg); // TODO RpcMessage
         }
 
         @Override

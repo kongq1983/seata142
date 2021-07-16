@@ -102,7 +102,7 @@ public class DefaultGlobalTransaction implements GlobalTransaction {
             throw new IllegalStateException("Global transaction already exists," +
                 " can't begin a new global transaction, currentXid = " + currentXid);
         }
-        xid = transactionManager.begin(null, null, name, timeout);
+        xid = transactionManager.begin(null, null, name, timeout); // TODO xid 从tc获取xid
         status = GlobalStatus.Begin;
         RootContext.bind(xid);
         if (LOGGER.isInfoEnabled()) {
