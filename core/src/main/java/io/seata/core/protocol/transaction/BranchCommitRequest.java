@@ -25,7 +25,7 @@ import io.seata.core.rpc.RpcContext;
  */
 public class BranchCommitRequest extends AbstractBranchEndRequest {
 
-    @Override
+    @Override /** typeCode=3 */
     public short getTypeCode() {
         return MessageType.TYPE_BRANCH_COMMIT;
     }

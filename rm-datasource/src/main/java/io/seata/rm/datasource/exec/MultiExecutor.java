@@ -58,7 +58,7 @@ public class MultiExecutor<T, S extends Statement> extends AbstractDMLBaseExecut
     }
 
     /**
-     * Before image table records.  only support update or deleted
+     * Before image table records.  only support update or deleted 只支持1种 要么是update，要么delete 不能update和delete混用
      *
      * @return the table records
      * @throws SQLException the sql exception

@@ -37,7 +37,7 @@ import java.util.List;
 class DruidSQLRecognizerFactoryImpl implements SQLRecognizerFactory {
     @Override
     public List<SQLRecognizer> create(String sql, String dbType) {
-        List<SQLStatement> asts = SQLUtils.parseStatements(sql, dbType);
+        List<SQLStatement> asts = SQLUtils.parseStatements(sql, dbType); // 每个SQLStatement是1条sql语句  比如 a-sql;b-sql;c-sql  这样是3个SQLStatement
         if (CollectionUtils.isEmpty(asts)) {
             throw new UnsupportedOperationException("Unsupported SQL: " + sql);
         }
@@ -50,13 +50,13 @@ class DruidSQLRecognizerFactoryImpl implements SQLRecognizerFactory {
         for (SQLStatement ast : asts) {
             SQLOperateRecognizerHolder recognizerHolder =
                     SQLOperateRecognizerHolderFactory.getSQLRecognizerHolder(dbType.toLowerCase());
-            if (ast instanceof SQLInsertStatement) {
+            if (ast instanceof SQLInsertStatement) { // insert
                 recognizer = recognizerHolder.getInsertRecognizer(sql, ast);
-            } else if (ast instanceof SQLUpdateStatement) {
+            } else if (ast instanceof SQLUpdateStatement) { // update
                 recognizer = recognizerHolder.getUpdateRecognizer(sql, ast);
-            } else if (ast instanceof SQLDeleteStatement) {
+            } else if (ast instanceof SQLDeleteStatement) { // delete
                 recognizer = recognizerHolder.getDeleteRecognizer(sql, ast);
-            } else if (ast instanceof SQLSelectStatement) {
+            } else if (ast instanceof SQLSelectStatement) { // select
                 recognizer = recognizerHolder.getSelectForUpdateRecognizer(sql, ast);
             }
             if (recognizer != null) {

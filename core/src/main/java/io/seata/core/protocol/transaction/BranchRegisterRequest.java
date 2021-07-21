@@ -110,7 +110,7 @@ public class BranchRegisterRequest extends AbstractTransactionRequestToTC  {
 
     @Override
     public short getTypeCode() {
-        return MessageType.TYPE_BRANCH_REGISTER;
+        return MessageType.TYPE_BRANCH_REGISTER; // 11
     }
 
     /**

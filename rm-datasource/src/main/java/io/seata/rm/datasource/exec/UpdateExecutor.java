@@ -90,7 +90,7 @@ public class UpdateExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
         if (StringUtils.isNotBlank(limit)) {
             suffix.append(limit);
         }
-        suffix.append(" FOR UPDATE");
+        suffix.append(" FOR UPDATE"); //加锁
         StringJoiner selectSQLJoin = new StringJoiner(", ", prefix.toString(), suffix.toString());
         if (ONLY_CARE_UPDATE_COLUMNS) {
             if (!containsPK(updateColumns)) {

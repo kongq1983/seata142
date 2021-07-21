@@ -68,20 +68,20 @@ public class ExecuteTemplate {
                                                      Object... args) throws SQLException {
         if (!RootContext.requireGlobalLock() && BranchType.AT != RootContext.getBranchType()) {
             // Just work as original statement
-            return statementCallback.execute(statementProxy.getTargetStatement(), args);
-        }
-
+            return statementCallback.execute(statementProxy.getTargetStatement(), args); // 只有当存在全局事务, 或者需要全局锁的时候, 才会加入 Seata 的流程, 否则用默认的 statement 直接执行
+        } //RootContext ThreadLocal 中存了 xid 和是否需要 global lock
+        //
         String dbType = statementProxy.getConnectionProxy().getDbType();
         if (CollectionUtils.isEmpty(sqlRecognizers)) {
-            sqlRecognizers = SQLVisitorFactory.get(
+            sqlRecognizers = SQLVisitorFactory.get( // 根据 db 的不同, 获取不同的分析器, Mysql Oracle
                     statementProxy.getTargetSQL(),
                     dbType);
         }
         Executor<T> executor;
-        if (CollectionUtils.isEmpty(sqlRecognizers)) {
+        if (CollectionUtils.isEmpty(sqlRecognizers)) { //PlainExecutor 是 jdbc 原始执行器, 不包含 Seata 的逻辑
             executor = new PlainExecutor<>(statementProxy, statementCallback);
-        } else {
-            if (sqlRecognizers.size() == 1) {
+        } else { // 分析出 SQL 的类型, 调用不同的执行器, 这里我们会发现 Select 语句会直接用原生的 PlainExecutor 执行
+            if (sqlRecognizers.size() == 1) { //也正是如此才说 Seata 默认执行在读未提交的隔离级别下(直接 select 查询, 并不会找 TC 确认锁的情况), 正如前面说的, 读已提交隔离级别是通过 SELECT_FOR_UPDATE + GlobalLock 联合来实现
                 SQLRecognizer sqlRecognizer = sqlRecognizers.get(0);
                 switch (sqlRecognizer.getSQLType()) {
                     case INSERT:
@@ -98,12 +98,12 @@ public class ExecuteTemplate {
                     case SELECT_FOR_UPDATE:
                         executor = new SelectForUpdateExecutor<>(statementProxy, statementCallback, sqlRecognizer);
                         break;
-                    default:
+                    default: // SELECT 语句会直接用原生的 PlainExecutor 执行   seata默认级别读未提交
                         executor = new PlainExecutor<>(statementProxy, statementCallback);
                         break;
                 }
             } else {
-                executor = new MultiExecutor<>(statementProxy, statementCallback, sqlRecognizers);
+                executor = new MultiExecutor<>(statementProxy, statementCallback, sqlRecognizers); // 多条sql语句执行  update or delete
             }
         }
         T rs;

@@ -76,7 +76,7 @@ public class DeleteExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
         if (StringUtils.isNotBlank(limit)) {
             suffix.append(limit);
         }
-        suffix.append(" FOR UPDATE");
+        suffix.append(" FOR UPDATE");  // 注意这里，加锁了
         StringJoiner selectSQLAppender = new StringJoiner(", ", "SELECT ", suffix.toString());
         for (String column : tableMeta.getAllColumns().keySet()) {
             selectSQLAppender.add(getColumnNameInSQL(ColumnUtils.addEscape(column, getDbType())));

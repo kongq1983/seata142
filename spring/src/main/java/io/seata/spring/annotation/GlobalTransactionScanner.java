@@ -294,13 +294,13 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator
                 if (clazz == null) {
                     continue;
                 }
-                GlobalTransactional trxAnno = clazz.getAnnotation(GlobalTransactional.class);
+                GlobalTransactional trxAnno = clazz.getAnnotation(GlobalTransactional.class); // 先从类上找
                 if (trxAnno != null) {
                     return true;
                 }
                 Method[] methods = clazz.getMethods();
                 for (Method method : methods) {
-                    trxAnno = method.getAnnotation(GlobalTransactional.class);
+                    trxAnno = method.getAnnotation(GlobalTransactional.class); // 从方法找
                     if (trxAnno != null) {
                         return true;
                     }
@@ -350,7 +350,7 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator
     public void onChangeEvent(ConfigurationChangeEvent event) {
         if (ConfigurationKeys.DISABLE_GLOBAL_TRANSACTION.equals(event.getDataId())) {
             disableGlobalTransaction = Boolean.parseBoolean(event.getNewValue().trim());
-            if (!disableGlobalTransaction && initialized.compareAndSet(false, true)) {
+            if (!disableGlobalTransaction && initialized.compareAndSet(false, true)) { // 一开始是disabled=true的,后来改成false，也就是要启用全局事务，然后判断有没有启用过
                 LOGGER.info("{} config changed, old value:{}, new value:{}", ConfigurationKeys.DISABLE_GLOBAL_TRANSACTION,
                         disableGlobalTransaction, event.getNewValue());
                 initClient();
