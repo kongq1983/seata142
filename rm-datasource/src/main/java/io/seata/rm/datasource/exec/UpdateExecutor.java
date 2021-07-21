@@ -68,7 +68,7 @@ public class UpdateExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
     protected TableRecords beforeImage() throws SQLException {
         ArrayList<List<Object>> paramAppenderList = new ArrayList<>();
         TableMeta tmeta = getTableMeta();
-        String selectSQL = buildBeforeImageSQL(tmeta, paramAppenderList);
+        String selectSQL = buildBeforeImageSQL(tmeta, paramAppenderList); // SELECT id, count FROM storage_tbl WHERE id = ? FOR UPDATE
         return buildTableRecords(tmeta, selectSQL, paramAppenderList);
     }
 
@@ -113,7 +113,7 @@ public class UpdateExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
         if (beforeImage == null || beforeImage.size() == 0) {
             return TableRecords.empty(getTableMeta());
         }
-        String selectSQL = buildAfterImageSQL(tmeta, beforeImage);
+        String selectSQL = buildAfterImageSQL(tmeta, beforeImage); // SELECT id, count FROM storage_tbl WHERE (id) in ( (?) )
         ResultSet rs = null;
         try (PreparedStatement pst = statementProxy.getConnection().prepareStatement(selectSQL)) {
             SqlGenerateUtils.setParamForPk(beforeImage.pkRows(), getTableMeta().getPrimaryKeyOnlyName(), pst);

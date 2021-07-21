@@ -76,9 +76,9 @@ public abstract class AbstractDMLBaseExecutor<T, S extends Statement> extends Ba
     }
 
     @Override
-    public T doExecute(Object... args) throws Throwable {
+    public T doExecute(Object... args) throws Throwable { // todo execute doExecute
         AbstractConnectionProxy connectionProxy = statementProxy.getConnectionProxy();
-        if (connectionProxy.getAutoCommit()) {
+        if (connectionProxy.getAutoCommit()) { // 自动提交
             return executeAutoCommitTrue(args);
         } else {
             return executeAutoCommitFalse(args);
@@ -96,9 +96,9 @@ public abstract class AbstractDMLBaseExecutor<T, S extends Statement> extends Ba
         if (!JdbcConstants.MYSQL.equalsIgnoreCase(getDbType()) && isMultiPk()) {
             throw new NotSupportYetException("multi pk only support mysql!");
         }
-        TableRecords beforeImage = beforeImage();
+        TableRecords beforeImage = beforeImage(); // 获取beforeImage
         T result = statementCallback.execute(statementProxy.getTargetStatement(), args);
-        TableRecords afterImage = afterImage(beforeImage);
+        TableRecords afterImage = afterImage(beforeImage); // 获取afterImage
         prepareUndoLog(beforeImage, afterImage);
         return result;
     }
@@ -134,10 +134,10 @@ public abstract class AbstractDMLBaseExecutor<T, S extends Statement> extends Ba
      */
     protected T executeAutoCommitTrue(Object[] args) throws Throwable {
         ConnectionProxy connectionProxy = statementProxy.getConnectionProxy();
-        try {
-            connectionProxy.changeAutoCommit();
+        try { // 一开始是autoCommit=true
+            connectionProxy.changeAutoCommit(); // 这里改成一开始是autoCommit=false
             return new LockRetryPolicy(connectionProxy).execute(() -> {
-                T result = executeAutoCommitFalse(args);
+                T result = executeAutoCommitFalse(args);  // 然后调用false
                 connectionProxy.commit();
                 return result;
             });

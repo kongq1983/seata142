@@ -226,7 +226,7 @@ public class ConnectionProxy extends AbstractConnectionProxy {
 
 
     private void doCommit() throws SQLException {
-        if (context.inGlobalTransaction()) {
+        if (context.inGlobalTransaction()) { // 分支事务判断  xid != null
             processGlobalTransactionCommit();
         } else if (context.isGlobalLockRequire()) {
             processLocalCommitWithGlobalLocks();
