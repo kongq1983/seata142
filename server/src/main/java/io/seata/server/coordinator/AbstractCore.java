@@ -70,7 +70,7 @@ public abstract class AbstractCore implements Core {
 
     public abstract BranchType getHandleBranchType();
 
-    @Override
+    @Override // todo 分支事务注册
     public Long branchRegister(BranchType branchType, String resourceId, String clientId, String xid,
                                String applicationData, String lockKeys) throws TransactionException {
         GlobalSession globalSession = assertGlobalSessionNotNull(xid, false);
@@ -82,7 +82,7 @@ public abstract class AbstractCore implements Core {
             MDC.put(RootContext.MDC_KEY_BRANCH_ID, String.valueOf(branchSession.getBranchId()));
             branchSessionLock(globalSession, branchSession);
             try {
-                globalSession.addBranch(branchSession);
+                globalSession.addBranch(branchSession); // todo 添加分支事务
             } catch (RuntimeException ex) {
                 branchSessionUnlock(branchSession);
                 throw new BranchTransactionException(FailedToAddBranch, String

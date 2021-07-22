@@ -261,13 +261,13 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
         lifecycleListeners.remove(sessionLifecycleListener);
     }
 
-    @Override
+    @Override // todo 分支事务添加
     public void addBranch(BranchSession branchSession) throws TransactionException {
         for (SessionLifecycleListener lifecycleListener : lifecycleListeners) {
-            lifecycleListener.onAddBranch(this, branchSession);
+            lifecycleListener.onAddBranch(this, branchSession); // 持久到数据库
         }
         branchSession.setStatus(BranchStatus.Registered);
-        add(branchSession);
+        add(branchSession); // 分支事务添加到branchSessions内存中
     }
 
     @Override

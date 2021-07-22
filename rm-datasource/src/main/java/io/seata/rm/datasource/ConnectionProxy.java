@@ -251,33 +251,33 @@ public class ConnectionProxy extends AbstractConnectionProxy {
         } catch (TransactionException e) {
             recognizeLockKeyConflictException(e, context.buildLockKeys());
         }
-        try {
-            UndoLogManagerFactory.getUndoLogManager(this.getDbType()).flushUndoLogs(this);
-            targetConnection.commit();
+        try { // undo_log持久化
+            UndoLogManagerFactory.getUndoLogManager(this.getDbType()).flushUndoLogs(this); // for mysql: MySQLUndoLogManager.insertUndoLog  undo_log持久化
+            targetConnection.commit(); // 事务提交
         } catch (Throwable ex) {
             LOGGER.error("process connectionProxy commit error: {}", ex.getMessage(), ex);
-            report(false);
+            report(false); // 向tc-server 报告提交完成
             throw new SQLException(ex);
         }
         if (IS_REPORT_SUCCESS_ENABLE) {
-            report(true);
+            report(true); // 向tc-server 报告提交完成
         }
         context.reset();
     }
-
+    /** 注册分支事务  */
     private void register() throws TransactionException {
         if (!context.hasUndoLog() || !context.hasLockKey()) {
             return;
         }
         Long branchId = DefaultResourceManager.get().branchRegister(BranchType.AT, getDataSourceProxy().getResourceId(),
-            null, context.getXid(), null, context.buildLockKeys());
-        context.setBranchId(branchId);
+            null, context.getXid(), null, context.buildLockKeys()); // 分支事务ID  branchId
+        context.setBranchId(branchId); // 设置分支事务ID
     }
 
     @Override
     public void rollback() throws SQLException {
-        targetConnection.rollback();
-        if (context.inGlobalTransaction() && context.isBranchRegistered()) {
+        targetConnection.rollback(); // 本地事务回滚
+        if (context.inGlobalTransaction() && context.isBranchRegistered()) { // 在全局事务中  并且分支事务也注册了
             report(false);
         }
         context.reset();
@@ -303,7 +303,7 @@ public class ConnectionProxy extends AbstractConnectionProxy {
     }
 
     private void report(boolean commitDone) throws SQLException {
-        if (context.getBranchId() == null) {
+        if (context.getBranchId() == null) { // 没有生成分支事务id
             return;
         }
         int retry = REPORT_RETRY_COUNT;

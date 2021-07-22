@@ -37,7 +37,7 @@ public class MySQLUndoLogManager extends AbstractUndoLogManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MySQLUndoLogManager.class);
 
-    /**
+    /** default: undo_log
      * branch_id, xid, context, rollback_info, log_status, log_created, log_modified
      */
     private static final String INSERT_UNDO_LOG_SQL = "INSERT INTO " + UNDO_LOG_TABLE_NAME +

@@ -435,7 +435,7 @@ public class DefaultCoordinator extends AbstractTCInboundHandler implements Tran
             }
         }, 0, ASYNC_COMMITTING_RETRY_PERIOD, TimeUnit.MILLISECONDS);
 
-        timeoutCheck.scheduleAtFixedRate(() -> {
+        timeoutCheck.scheduleAtFixedRate(() -> {  // TODO 超时校验
             boolean lock = SessionHolder.txTimeoutCheckLock();
             if (lock) {
                 try {
@@ -448,7 +448,7 @@ public class DefaultCoordinator extends AbstractTCInboundHandler implements Tran
             }
         }, 0, TIMEOUT_RETRY_PERIOD, TimeUnit.MILLISECONDS);
 
-        undoLogDelete.scheduleAtFixedRate(() -> {
+        undoLogDelete.scheduleAtFixedRate(() -> { // todo 定时删除 undo_log
             boolean lock = SessionHolder.undoLogDeleteLock();
             if (lock) {
                 try {

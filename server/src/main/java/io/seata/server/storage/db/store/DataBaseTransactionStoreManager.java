@@ -98,13 +98,13 @@ public class DataBaseTransactionStoreManager extends AbstractTransactionStoreMan
 
     @Override
     public boolean writeSession(LogOperation logOperation, SessionStorable session) {
-        if (LogOperation.GLOBAL_ADD.equals(logOperation)) {
+        if (LogOperation.GLOBAL_ADD.equals(logOperation)) { // 全局事务添加
             return logStore.insertGlobalTransactionDO(SessionConverter.convertGlobalTransactionDO(session));
         } else if (LogOperation.GLOBAL_UPDATE.equals(logOperation)) {
             return logStore.updateGlobalTransactionDO(SessionConverter.convertGlobalTransactionDO(session));
         } else if (LogOperation.GLOBAL_REMOVE.equals(logOperation)) {
             return logStore.deleteGlobalTransactionDO(SessionConverter.convertGlobalTransactionDO(session));
-        } else if (LogOperation.BRANCH_ADD.equals(logOperation)) {
+        } else if (LogOperation.BRANCH_ADD.equals(logOperation)) {  // 分支事务添加
             return logStore.insertBranchTransactionDO(SessionConverter.convertBranchTransactionDO(session));
         } else if (LogOperation.BRANCH_UPDATE.equals(logOperation)) {
             return logStore.updateBranchTransactionDO(SessionConverter.convertBranchTransactionDO(session));
@@ -153,15 +153,15 @@ public class DataBaseTransactionStoreManager extends AbstractTransactionStoreMan
      */
     @Override
     public GlobalSession readSession(String xid, boolean withBranchSessions) {
-        //global transaction
+        //global transaction   先从global_table根据xid找全局事务
         GlobalTransactionDO globalTransactionDO = logStore.queryGlobalTransactionDO(xid);
         if (globalTransactionDO == null) {
-            return null;
+            return null; // 找不到，则直接返回
         }
         //branch transactions
         List<BranchTransactionDO> branchTransactionDOs = null;
         //reduce rpc with db when branchRegister and getGlobalStatus
-        if (withBranchSessions) {
+        if (withBranchSessions) { // 根据xid找分支事务 branch_table
             branchTransactionDOs = logStore.queryBranchTransactionDO(globalTransactionDO.getXid());
         }
         return getGlobalSession(globalTransactionDO, branchTransactionDOs);
@@ -219,8 +219,8 @@ public class DataBaseTransactionStoreManager extends AbstractTransactionStoreMan
         GlobalSession globalSession = SessionConverter.convertGlobalSession(globalTransactionDO);
         //branch transactions
         if (CollectionUtils.isNotEmpty(branchTransactionDOs)) {
-            for (BranchTransactionDO branchTransactionDO : branchTransactionDOs) {
-                globalSession.add(SessionConverter.convertBranchSession(branchTransactionDO));
+            for (BranchTransactionDO branchTransactionDO : branchTransactionDOs) { // 分支事务有多个的
+                globalSession.add(SessionConverter.convertBranchSession(branchTransactionDO)); // todo 创建分支事务  branch
             }
         }
         return globalSession;
