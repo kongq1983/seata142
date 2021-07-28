@@ -21,7 +21,7 @@ import io.seata.core.model.BranchType;
 import io.seata.core.rpc.RemotingServer;
 import io.seata.server.coordinator.AbstractCore;
 
-/**
+/** todo xa core
  * The type XA core.
  *
  * @author sharajava

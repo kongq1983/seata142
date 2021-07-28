@@ -247,7 +247,7 @@ public class LockStoreDataBaseDAO implements LockStore {
         }
         return true;
     }
-
+    /**  根据xid和branchIds删除分支事务数据  lock_table */
     @Override
     public boolean unLock(String xid, List<Long> branchIds) {
         Connection conn = null;
@@ -257,7 +257,7 @@ public class LockStoreDataBaseDAO implements LockStore {
             conn.setAutoCommit(true);
             StringJoiner sj = new StringJoiner(",");
             branchIds.forEach(branchId -> sj.add("?"));
-            //batch release lock by branch list
+            //batch release lock by branch list   根据xid和branchIds删除分支事务数据  lock_table
             String batchDeleteSQL = LockStoreSqlFactory.getLogStoreSql(dbType).getBatchDeleteLockSqlByBranchs(lockTable, sj.toString());
             ps = conn.prepareStatement(batchDeleteSQL);
             ps.setString(1, xid);

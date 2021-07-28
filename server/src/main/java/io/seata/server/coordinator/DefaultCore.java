@@ -42,7 +42,7 @@ import org.slf4j.MDC;
 
 import static io.seata.server.session.BranchSessionHandler.CONTINUE;
 
-/**
+/** // todo default core
  * The type Default core.
  *
  * @author sharajava
@@ -52,7 +52,7 @@ public class DefaultCore implements Core {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCore.class);
 
     private EventBus eventBus = EventBusManager.get();
-
+    // 存放core集合
     private static Map<BranchType, AbstractCore> coreMap = new ConcurrentHashMap<>();
 
     /**
@@ -60,12 +60,12 @@ public class DefaultCore implements Core {
      *
      * @param remotingServer the remoting server
      */
-    public DefaultCore(RemotingServer remotingServer) {
+    public DefaultCore(RemotingServer remotingServer) { // META-INF/services目录下 io.seata.server.coordinator.AbstractCore
         List<AbstractCore> allCore = EnhancedServiceLoader.loadAll(AbstractCore.class,
             new Class[]{RemotingServer.class}, new Object[]{remotingServer});
         if (CollectionUtils.isNotEmpty(allCore)) {
-            for (AbstractCore core : allCore) {
-                coreMap.put(core.getHandleBranchType(), core);
+            for (AbstractCore core : allCore) { // ATCore TccCore SagaCore XACore
+                coreMap.put(core.getHandleBranchType(), core); // 这里放入core
             }
         }
     }
@@ -142,18 +142,18 @@ public class DefaultCore implements Core {
 
     @Override
     public GlobalStatus commit(String xid) throws TransactionException {
-        GlobalSession globalSession = SessionHolder.findGlobalSession(xid);
-        if (globalSession == null) {
+        GlobalSession globalSession = SessionHolder.findGlobalSession(xid); // 通过xid查找全局事务
+        if (globalSession == null) { // 未找到
             return GlobalStatus.Finished;
-        }
+        }  //  @see io.seata.server.storage.db.session.DataBaseSessionManager
         globalSession.addSessionLifecycleListener(SessionHolder.getRootSessionManager());
         // just lock changeStatus
-
+        // 加锁执行
         boolean shouldCommit = SessionHolder.lockAndExecute(globalSession, () -> {
             // Highlight: Firstly, close the session, then no more branch can be registered.
-            globalSession.closeAndClean();
+            globalSession.closeAndClean(); // 首先关闭会话，然后就不能再注册分支了 删除分支事务
             if (globalSession.getStatus() == GlobalStatus.Begin) {
-                if (globalSession.canBeCommittedAsync()) {
+                if (globalSession.canBeCommittedAsync()) {  // at 支持异步提交
                     globalSession.asyncCommit();
                     return false;
                 } else {
@@ -163,9 +163,9 @@ public class DefaultCore implements Core {
             }
             return false;
         });
-
-        if (shouldCommit) {
-            boolean success = doGlobalCommit(globalSession, false);
+        // shouldCommit = true 同步提交
+        if (shouldCommit) { // at支持异步提交  不会进入这里
+            boolean success = doGlobalCommit(globalSession, false);  // 同步提交  不会重试
             //If successful and all remaining branches can be committed asynchronously, do async commit.
             if (success && globalSession.hasBranch() && globalSession.canBeCommittedAsync()) {
                 globalSession.asyncCommit();
@@ -189,7 +189,7 @@ public class DefaultCore implements Core {
         if (globalSession.isSaga()) {
             success = getCore(BranchType.SAGA).doGlobalCommit(globalSession, retrying);
         } else {
-            Boolean result = SessionHelper.forEach(globalSession.getSortedBranches(), branchSession -> {
+            Boolean result = SessionHelper.forEach(globalSession.getSortedBranches(), branchSession -> { // 循环遍历分支事务
                 // if not retrying, skip the canBeCommittedAsync branches
                 if (!retrying && branchSession.canBeCommittedAsync()) {
                     return CONTINUE;

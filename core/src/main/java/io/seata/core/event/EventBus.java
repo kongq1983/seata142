@@ -24,6 +24,6 @@ public interface EventBus {
     void register(Object subscriber);
 
     void unregister(Object subscriber);
-
+    /** 看register */
     void post(Event event);
 }

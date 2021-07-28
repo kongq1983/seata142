@@ -122,7 +122,7 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
      */
     public boolean canBeCommittedAsync() {
         for (BranchSession branchSession : branchSessions) {
-            if (!branchSession.canBeCommittedAsync()) {
+            if (!branchSession.canBeCommittedAsync()) { // branchType == BranchType.AT || status == BranchStatus.PhaseOne_Failed
                 return false;
             }
         }
@@ -166,9 +166,9 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
         return (System.currentTimeMillis() - beginTime) > timeout;
     }
 
-    /**
+    /** 默认是否超过130s
      * prevent could not handle committing and rollbacking transaction
-     * @return if true retry commit or roll back
+     * @return if true retry commit or roll back   RETRY_DEAD_THRESHOLD:默认130s
      */
     public boolean isDeadSession() {
         return (System.currentTimeMillis() - beginTime) > RETRY_DEAD_THRESHOLD;
@@ -226,9 +226,9 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
     }
 
     public void clean() throws TransactionException {
-        if (this.hasATBranch()) {
-            if (!LockerManagerFactory.getLockManager().releaseGlobalSessionLock(this)) {
-                throw new TransactionException("UnLock globalSession error, xid = " + this.xid);
+        if (this.hasATBranch()) { // 存在at事务
+            if (!LockerManagerFactory.getLockManager().releaseGlobalSessionLock(this)) { //  数据库存储： 根据xid和branchIds删除分支事务数据  lock_table
+                throw new TransactionException("UnLock globalSession error, xid = " + this.xid); // 删除失败
             }
         }
     }

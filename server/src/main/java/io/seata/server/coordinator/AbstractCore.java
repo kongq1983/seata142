@@ -48,7 +48,7 @@ import static io.seata.core.exception.TransactionExceptionCode.GlobalTransaction
 import static io.seata.core.exception.TransactionExceptionCode.FailedToSendBranchCommitRequest;
 import static io.seata.core.exception.TransactionExceptionCode.FailedToSendBranchRollbackRequest;
 
-/**
+/**  TODO 全局事务关键类
  * The type abstract core.
  *
  * @author ph3636

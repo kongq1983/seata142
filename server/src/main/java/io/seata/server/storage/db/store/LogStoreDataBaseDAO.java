@@ -351,7 +351,7 @@ public class LogStoreDataBaseDAO implements LogStore {
             IOUtil.close(ps, conn);
         }
     }
-
+    /**  todo db模式  删除分支事务数据 branch_table */
     @Override
     public boolean deleteBranchTransactionDO(BranchTransactionDO branchTransactionDO) {
         String sql = LogStoreSqlsFactory.getLogStoreSqls(dbType).getDeleteBranchTransactionByBranchIdSQL(branchTable);

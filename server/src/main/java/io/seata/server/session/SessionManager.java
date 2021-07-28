@@ -63,7 +63,7 @@ public interface SessionManager extends SessionLifecycleListener, Disposable {
      */
     void updateGlobalSessionStatus(GlobalSession session, GlobalStatus status) throws TransactionException;
 
-    /**
+    /** TODO 删除全局事务 db模式-删除global-table
      * Remove global session.
      *
      * @param session the session
@@ -89,7 +89,7 @@ public interface SessionManager extends SessionLifecycleListener, Disposable {
      */
     void updateBranchSessionStatus(BranchSession session, BranchStatus status) throws TransactionException;
 
-    /**
+    /** TODO 删除分支事务 db模式-删除branch-table
      * Remove branch session.
      *
      * @param globalSession the global session

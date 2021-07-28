@@ -18,7 +18,7 @@ package io.seata.spring.event;
 
 import io.seata.core.event.Event;
 
-/**
+/** 降級检查事件
  * @author slievrly
  */
 public class DegradeCheckEvent implements Event {

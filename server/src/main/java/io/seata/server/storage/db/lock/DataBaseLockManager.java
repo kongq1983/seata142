@@ -67,16 +67,16 @@ public class DataBaseLockManager extends AbstractLockManager implements Initiali
     public Locker getLocker(BranchSession branchSession) {
         return locker;
     }
-
+    // todo 全局事务释放
     @Override
     public boolean releaseGlobalSessionLock(GlobalSession globalSession) throws TransactionException {
-        List<BranchSession> branchSessions = globalSession.getBranchSessions();
+        List<BranchSession> branchSessions = globalSession.getBranchSessions(); // 获取当前全局事务下的分支事务列表
         if (CollectionUtils.isEmpty(branchSessions)) {
-            return true;
+            return true; // 不存在，则返回true
         }
-        List<Long> branchIds = branchSessions.stream().map(BranchSession::getBranchId).collect(Collectors.toList());
+        List<Long> branchIds = branchSessions.stream().map(BranchSession::getBranchId).collect(Collectors.toList()); // 获取分支事务ID列表
         try {
-            return getLocker().releaseLock(globalSession.getXid(), branchIds);
+            return getLocker().releaseLock(globalSession.getXid(), branchIds); // 数据库存储： 根据xid和branchIds删除分支事务数据  lock_table
         } catch (Exception t) {
             LOGGER.error("unLock globalSession error, xid:{} branchIds:{}", globalSession.getXid(),
                 CollectionUtils.toString(branchIds), t);

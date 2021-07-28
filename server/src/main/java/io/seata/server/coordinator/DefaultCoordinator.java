@@ -305,32 +305,32 @@ public class DefaultCoordinator extends AbstractTCInboundHandler implements Tran
         });
     }
 
-    /**
+    /** 给rm发送commit消息  有重试机制  todo 全局事务提交 定时器每1s触发1次
      * Handle retry committing.
      */
-    protected void handleRetryCommitting() {
+    protected void handleRetryCommitting() { // 获取所有的全局事务列表
         Collection<GlobalSession> committingSessions = SessionHolder.getRetryCommittingSessionManager().allSessions();
         if (CollectionUtils.isEmpty(committingSessions)) {
             return;
         }
         long now = System.currentTimeMillis();
-        SessionHelper.forEach(committingSessions, committingSession -> {
+        SessionHelper.forEach(committingSessions, committingSession -> { // 循环遍历处理全局事务committingSessions
             try {
                 // prevent repeated commit
                 if (committingSession.getStatus().equals(GlobalStatus.Committing) && !committingSession.isDeadSession()) {
                     //The function of this 'return' is 'continue'.
                     return;
-                }
+                } // MAX_COMMIT_RETRY_TIMEOUT.toMillis() = 100ms  离上次执行时间超过100ms才执行
                 if (isRetryTimeout(now, MAX_COMMIT_RETRY_TIMEOUT.toMillis(), committingSession.getBeginTime())) {
                     /**
                      * Prevent thread safety issues
                      */
-                    SessionHolder.getRetryCommittingSessionManager().removeGlobalSession(committingSession);
+                    SessionHolder.getRetryCommittingSessionManager().removeGlobalSession(committingSession); // 删除全局事务表 global_table
                     LOGGER.error("Global transaction commit retry timeout and has removed [{}]", committingSession.getXid());
                     //The function of this 'return' is 'continue'.
                     return;
                 }
-                committingSession.addSessionLifecycleListener(SessionHolder.getRootSessionManager());
+                committingSession.addSessionLifecycleListener(SessionHolder.getRootSessionManager()); // DataBaseSessionManager
                 core.doGlobalCommit(committingSession, true);
             } catch (TransactionException ex) {
                 LOGGER.info("Failed to retry committing [{}] {} {}", committingSession.getXid(), ex.getCode(), ex.getMessage());

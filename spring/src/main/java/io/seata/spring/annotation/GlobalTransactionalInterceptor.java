@@ -126,7 +126,7 @@ public class GlobalTransactionalInterceptor implements ConfigurationChangeListen
                 ConfigurationKeys.CLIENT_DEGRADE_CHECK_PERIOD, DEFAULT_TM_DEGRADE_CHECK_PERIOD); // DEFAULT_TM_DEGRADE_CHECK_PERIOD默认2000
             degradeCheckAllowTimes = ConfigurationFactory.getInstance().getInt(
                 ConfigurationKeys.CLIENT_DEGRADE_CHECK_ALLOW_TIMES, DEFAULT_TM_DEGRADE_CHECK_ALLOW_TIMES); // DEFAULT_TM_DEGRADE_CHECK_ALLOW_TIMES 默认10
-            EVENT_BUS.register(this);
+            EVENT_BUS.register(this); // 注冊事件
             if (degradeCheckPeriod > 0 && degradeCheckAllowTimes > 0) {
                 startDegradeCheck();
             }
@@ -294,14 +294,14 @@ public class GlobalTransactionalInterceptor implements ConfigurationChangeListen
                 try {
                     String xid = TransactionManagerHolder.get().begin(null, null, "degradeCheck", 60000);
                     TransactionManagerHolder.get().commit(xid);
-                    EVENT_BUS.post(new DegradeCheckEvent(true));
+                    EVENT_BUS.post(new DegradeCheckEvent(true)); // onDegradeCheck
                 } catch (Exception e) {
-                    EVENT_BUS.post(new DegradeCheckEvent(false));
+                    EVENT_BUS.post(new DegradeCheckEvent(false)); // onDegradeCheck
                 }
             }
         }, degradeCheckPeriod, degradeCheckPeriod, TimeUnit.MILLISECONDS);
     }
-
+    /*** 只有通过@Subscribe注解的方法才会被注册进EventBus */
     @Subscribe
     public static void onDegradeCheck(DegradeCheckEvent event) {
         if (event.isRequestSuccess()) {
